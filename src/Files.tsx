@@ -5,7 +5,7 @@ import { useCallback } from 'react'
 import bytes from 'bytes'
 
 if (typeof window !== undefined) {
-  import(/* webpackMode: "eager" */ '@github/time-elements')
+  import('@github/time-elements')
 }
 
 export default function Files() {
