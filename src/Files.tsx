@@ -50,22 +50,18 @@ function FileView(props: { file: FileItem }) {
     window.open(URL.createObjectURL(blob), '_blank')
   }, [file])
   return (
-    <li data-file-id={file._id} className="flex items-center p-1">
-      <div className="mr-2 flex-none">
+    <li data-file-id={file._id} className="flex items-center my-1">
+      <div className="flex-none">
         <FileIcon name={file.name} />
       </div>
-      <a
-        className="flex-auto"
-        onClick={open}
-        ref={(a) => a && (a.href = 'javascript://' + file.name)}
-      >
-        {file.name}
-      </a>
-      <div className="">
-        {file.type} / {bytes(file.size)} /{' '}
-        <relative-time dateTime={file.added} title={file.added}>
-          {file.added}
-        </relative-time>
+      <div className="flex-auto p-2">
+        <h2 className="leading-tight">{file.name}</h2>
+        <p className="text-#8b8685 text-xs">
+          {file.type} / {bytes(file.size)} /{' '}
+          <relative-time dateTime={file.added} title={file.added}>
+            {file.added}
+          </relative-time>
+        </p>
       </div>
     </li>
   )
