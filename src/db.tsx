@@ -7,14 +7,28 @@ export interface FileDbEntry {
   type: string
 }
 
-type Db = PouchDB.Database<FileDbEntry>
+export interface ShareTargetEntry {
+  added: string
+  url: string | null
+  text: string | null
+  title: string | null
+}
 
-let filesDb: Db | undefined
+let filesDb: PouchDB.Database<FileDbEntry> | undefined
+let shareTargetDb: PouchDB.Database<ShareTargetEntry> | undefined
 
-export function getDatabase() {
+export function getFilesDatabase() {
   if (!filesDb) {
     filesDb = new PouchDB('files', { auto_compaction: true })
     Object.assign(window, { filesDb })
   }
   return filesDb
+}
+
+export function getShareTargetDatabase() {
+  if (!shareTargetDb) {
+    shareTargetDb = new PouchDB('sharetarget', { auto_compaction: true })
+    Object.assign(window, { shareTargetDb })
+  }
+  return shareTargetDb
 }
