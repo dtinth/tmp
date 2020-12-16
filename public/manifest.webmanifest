@@ -1,0 +1,21 @@
+{
+  "name": "tmp",
+  "short_name": "tmp",
+  "icons": [
+    {
+      "src": "/tmp_192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/tmp_512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#353433",
+  "background_color": "#353433",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait"
+}

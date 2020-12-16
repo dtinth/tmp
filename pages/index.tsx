@@ -50,7 +50,8 @@ export default function Home() {
     <div className="p-6">
       <Head>
         <title>tmp</title>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="manifest" href="/manifest.webmanifest" />
+        <link rel="icon" href="/tmp_512.png" />
       </Head>
       <strong>Welcome to your web-based local file storage.</strong> Just drop
       or paste in files and images, and they will appear here.
