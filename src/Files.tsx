@@ -332,7 +332,17 @@ function NewItemView(props: {}) {
       >
         {renderMenuItem('Select files from your device', async () => {
           const { fileOpen } = await import('browser-nativefs')
-          const files = await fileOpen({ multiple: true })
+          const files = await fileOpen({
+            multiple: true,
+            mimeTypes: [
+              '*/*',
+              'image/*',
+              'video/*',
+              'audio/*',
+              'application/*',
+              'text/*',
+            ],
+          })
           await importFiles(files)
         })}
       </Menu>
