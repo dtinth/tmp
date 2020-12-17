@@ -51,6 +51,7 @@ function useFiles(): { isLoading: any; error: any; data: any } {
 enum FileActionGroup {
   Open = 'open',
   Download = 'download',
+  Share = 'share',
   SaveAs = 'save-as',
   Delete = 'delete',
   Rename = 'rename',
@@ -89,6 +90,15 @@ const fileActions: FileAction[] = [
     label: 'Download',
     action: async ({ file, blob }) => {
       triggerDownload(blob, file.name, blob.type)
+    },
+  },
+  {
+    group: FileActionGroup.Share,
+    label: 'Share',
+    when: () => !!navigator.share,
+    action: async ({ file, blob }) => {
+      const files = [new File([blob], file.name, { type: blob.type })]
+      return (navigator as any).share({ files })
     },
   },
   {
