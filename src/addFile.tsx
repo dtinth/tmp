@@ -1,4 +1,5 @@
 import { FileDbEntry } from './db'
+import { getType } from 'mime'
 
 export async function addFile(
   db: PouchDB.Database<FileDbEntry>,
@@ -6,15 +7,16 @@ export async function addFile(
   name: string,
   added = new Date().toJSON()
 ) {
+  const type = getType(name) || 'application/octet-stream'
   return await db.post({
     name: name,
     size: blob.size,
     added: added,
-    type: blob.type,
+    type: type,
     _attachments: {
       blob: {
-        content_type: blob.type,
-        data: blob,
+        content_type: type,
+        data: new Blob([blob], { type }),
       },
     },
   })
