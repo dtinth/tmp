@@ -1,7 +1,7 @@
-import { useQuery } from 'react-query'
-import { FileDbEntry, getFilesDatabase } from './db'
+import { useQuery, useQueryClient } from 'react-query'
+import { FileDbEntry, FilesDb, getFilesDatabase } from './db'
 import FileIcon from './FileIcon'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import bytes from 'bytes'
 import {
   Menu,
@@ -57,7 +57,14 @@ interface FileAction {
   group: FileActionGroup
   label: string
   when?: (file: FileItem) => boolean
-  action?: (file: FileItem, blob: Blob, blobUrl: string) => Promise<void>
+  action?: (context: FileActionContext) => Promise<void>
+}
+
+interface FileActionContext {
+  file: FileItem
+  blob: Blob
+  blobUrl: string
+  updateDb: (cb: (db: FilesDb) => Promise<void | boolean>) => Promise<void>
 }
 
 /**
@@ -69,7 +76,7 @@ const fileActions: FileAction[] = [
   {
     group: FileActionGroup.Open,
     label: 'Open with browser',
-    action: async (_file, _blob, blobUrl) => {
+    action: async ({ blobUrl }) => {
       window.open(blobUrl, '_blank')
     },
     when: (file) => openable.has(file.type),
@@ -77,7 +84,7 @@ const fileActions: FileAction[] = [
   {
     group: FileActionGroup.Download,
     label: 'Download',
-    action: async (file, blob, _blobUrl) => {
+    action: async ({ file, blob }) => {
       triggerDownload(blob, file.name, blob.type)
     },
   },
@@ -85,7 +92,7 @@ const fileActions: FileAction[] = [
     group: FileActionGroup.SaveAs,
     label: 'Save as',
     when: () => 'showSaveFilePicker' in window,
-    action: async (file, blob, _blobUrl) => {
+    action: async ({ file, blob }) => {
       const extnameMatch = file.name.match(/\.\w+$/)
       const handle = await (window as any).showSaveFilePicker({
         types: [
@@ -106,6 +113,14 @@ const fileActions: FileAction[] = [
   {
     group: FileActionGroup.Delete,
     label: 'Delete',
+    action: async ({ file, updateDb }) => {
+      updateDb(async (db) => {
+        await db.remove({
+          _id: file._id,
+          _rev: file._rev,
+        })
+      })
+    },
   },
   {
     group: FileActionGroup.Rename,
@@ -133,6 +148,9 @@ function FileList(props: { files: FileItem[] }) {
 }
 
 function FileView(props: { file: FileItem }) {
+  const queryClient = useQueryClient()
+  const queryClientRef = useRef(queryClient)
+  queryClientRef.current = queryClient
   const menu = useMenuState()
   const { file } = props
   const fileActions = useFileActions(file)
@@ -186,7 +204,19 @@ function FileView(props: { file: FileItem }) {
           action.label,
           action.action &&
             blobUrl &&
-            (() => action.action(file, blobInfo.blob, blobUrl))
+            (() =>
+              action.action({
+                file,
+                blob: blobInfo.blob,
+                blobUrl,
+                updateDb: async (f) => {
+                  const db = getFilesDatabase()
+                  const shouldRefresh = await f(db)
+                  if (shouldRefresh !== false) {
+                    queryClientRef.current.invalidateQueries()
+                  }
+                },
+              }))
         )
       )
   }

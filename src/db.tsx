@@ -14,8 +14,11 @@ export interface ShareTargetEntry {
   title: string | null
 }
 
-let filesDb: PouchDB.Database<FileDbEntry> | undefined
-let shareTargetDb: PouchDB.Database<ShareTargetEntry> | undefined
+export type FilesDb = PouchDB.Database<FileDbEntry>
+export type ShareTargetDb = PouchDB.Database<ShareTargetEntry>
+
+let filesDb: FilesDb | undefined
+let shareTargetDb: ShareTargetDb | undefined
 
 export function getFilesDatabase() {
   if (!filesDb) {
