@@ -44,7 +44,7 @@ function useFiles(): { isLoading: any; error: any; data: any } {
       .flatMap((row) => {
         return row.doc ? [row.doc] : []
       })
-      .sort((a, b) => (a.added < b.added ? -1 : 1))
+      .sort((a, b) => (a.added < b.added ? 1 : -1))
   })
 }
 
