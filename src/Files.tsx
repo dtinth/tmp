@@ -51,7 +51,7 @@ function FileView(props: { file: FileItem }) {
   }, [file])
   return (
     <li data-file-id={file._id} className="flex items-center my-1">
-      <div className="flex-none">
+      <div className="flex-none mr-1">
         <FileIcon name={file.name} />
       </div>
       <div className="flex-auto p-2">
