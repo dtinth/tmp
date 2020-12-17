@@ -319,7 +319,7 @@ function NewItemView(props: {}) {
         aria-label="File actions"
         className="bg-#090807 border border-#656463"
       >
-        {renderMenuItem('Import from your computer', async () => {
+        {renderMenuItem('Select files from your device', async () => {
           const { fileOpen } = await import('browser-nativefs')
           const files = await fileOpen({ multiple: true })
           await importFiles(files)
