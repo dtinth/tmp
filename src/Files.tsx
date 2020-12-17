@@ -57,7 +57,7 @@ function FileView(props: { file: FileItem }) {
       <div className="flex-auto p-2">
         <h2 className="leading-tight">{file.name}</h2>
         <p className="text-#8b8685 text-xs">
-          {file.type} / {bytes(file.size)} /{' '}
+          {file.type} &middot; {bytes(file.size)} &middot;{' '}
           <relative-time dateTime={file.added} title={file.added}>
             {file.added}
           </relative-time>
