@@ -26,6 +26,7 @@ export default function Files() {
 }
 
 interface FileItem extends FileDbEntry {
+  _rev: string
   _id: string
   _attachments: {
     blob: {
@@ -111,6 +112,8 @@ function FileView(props: { file: FileItem }) {
   return (
     <li
       data-file-id={file._id}
+      data-file-hash={file._attachments.blob.digest}
+      data-file-rev={file._rev}
       data-file-name={file.name}
       data-file-type={file.type}
       data-file-size={file.size}
