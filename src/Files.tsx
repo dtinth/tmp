@@ -11,6 +11,7 @@ import {
   useMenuState,
 } from 'reakit/Menu'
 import triggerDownload from 'downloadjs'
+import classNames from 'classnames'
 
 if (typeof HTMLElement !== undefined) {
   import('@github/time-elements')
@@ -92,12 +93,16 @@ function FileView(props: { file: FileItem }) {
     const blob = ((await db.getAttachment(file._id, 'blob')) as unknown) as Blob
     triggerDownload(blob, file.name, blob.type)
   }, [file])
-  const renderMenuItem = (text: string, action: () => void) => {
+  const renderMenuItem = (text: string, action?: () => void) => {
     return (
       <MenuItem
         {...menu}
+        disabled={!action}
         onClick={action}
-        className="block w-full text-left px-2 py-1 focus:bg-#454443"
+        className={classNames(
+          'block w-full text-left px-2 py-1 focus:bg-#454443',
+          !action && 'text-#656463'
+        )}
       >
         {text}
       </MenuItem>
@@ -142,6 +147,10 @@ function FileView(props: { file: FileItem }) {
       >
         {renderMenuItem('Open with browser', open)}
         {renderMenuItem('Download', download)}
+        {renderMenuItem('Save as')}
+        <MenuSeparator />
+        {renderMenuItem('Delete')}
+        {renderMenuItem('Rename')}
       </Menu>
     </li>
   )
