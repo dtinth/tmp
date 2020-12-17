@@ -1,13 +1,10 @@
 import Head from 'next/head'
 import { useEffect, useRef } from 'react'
 import { useQueryClient } from 'react-query'
-import {
-  FileDbEntry,
-  getFilesDatabase,
-  getShareTargetDatabase,
-} from '../src/db'
+import { getFilesDatabase, getShareTargetDatabase } from '../src/db'
 import Files from '../src/Files'
 import useFileImporter from '../src/useFileImporter'
+import { addFile } from '../src/addFile'
 
 export default function Home() {
   const importFiles = useFileImporter()
@@ -48,26 +45,6 @@ export default function Home() {
       <ShareTargetWorker />
     </div>
   )
-}
-
-export async function addFile(
-  db: PouchDB.Database<FileDbEntry>,
-  blob: Blob,
-  name: string,
-  added = new Date().toJSON()
-) {
-  return await db.post({
-    name: name,
-    size: blob.size,
-    added: added,
-    type: blob.type,
-    _attachments: {
-      blob: {
-        content_type: blob.type,
-        data: blob,
-      },
-    },
-  })
 }
 
 function ShareTargetWorker() {

@@ -1,7 +1,7 @@
 import { useCallback, useRef } from 'react'
 import { useQueryClient } from 'react-query'
 import { getFilesDatabase } from './db'
-import { addFile } from '../pages/index'
+import { addFile } from './addFile'
 
 export default function useFileImporter() {
   const queryClient = useQueryClient()
