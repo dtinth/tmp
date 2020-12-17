@@ -1,7 +1,7 @@
 import { useQuery } from 'react-query'
 import { FileDbEntry, getFilesDatabase } from './db'
 import FileIcon from './FileIcon'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import bytes from 'bytes'
 import {
   Menu,
@@ -45,6 +45,52 @@ function useFiles(): { isLoading: any; error: any; data: any } {
   })
 }
 
+interface FileAction {
+  label: string
+  action?: (file: FileItem, blob: Blob, blobUrl: string) => Promise<void>
+}
+
+const fileActions: FileAction[] = [
+  {
+    label: 'Open with browser',
+    action: async (_file, _blob, blobUrl) => {
+      window.open(blobUrl, '_blank')
+    },
+  },
+  {
+    label: 'Download',
+    action: async (file, blob, _blobUrl) => {
+      triggerDownload(blob, file.name, blob.type)
+    },
+  },
+  {
+    label: 'Save as',
+    action: async (file, blob, _blobUrl) => {
+      const extnameMatch = file.name.match(/\.\w+$/)
+      const handle = await (window as any).showSaveFilePicker({
+        types: [
+          {
+            description: file.type,
+            accept: { [file.type]: extnameMatch ? [extnameMatch[0]] : [] },
+          },
+        ],
+      })
+      const stream = await handle.createWritable()
+      try {
+        await stream.write(blob)
+      } finally {
+        await stream.close()
+      }
+    },
+  },
+  { label: 'Delete' },
+  { label: 'Rename' },
+]
+
+function useFileActions(file: FileItem) {
+  return fileActions
+}
+
 function FileList(props: { files: FileItem[] }) {
   return (
     <div>
@@ -60,17 +106,25 @@ function FileList(props: { files: FileItem[] }) {
 function FileView(props: { file: FileItem }) {
   const menu = useMenuState()
   const { file } = props
-  const [blobUrl, setBlobUrl] = useState('')
+  const fileActions = useFileActions(file)
+  const [blobInfo, setBlobInfo] = useState({
+    blob: null as Blob | null,
+    url: '',
+  })
+  const blobUrl = blobInfo.url
   const blobDigest = file._attachments.blob.digest
   useEffect(() => {
     let canceled = false
     let onCancel = () => {}
     ;(async () => {
       const db = getFilesDatabase()
-      const blob = await db.getAttachment(file._id, 'blob')
+      const blob = ((await db.getAttachment(
+        file._id,
+        'blob'
+      )) as unknown) as Blob
       if (canceled) return
       const blobUrl = URL.createObjectURL(blob)
-      setBlobUrl(blobUrl)
+      setBlobInfo({ blob, url: blobUrl })
       onCancel = () => {
         URL.revokeObjectURL(blobUrl)
       }
@@ -80,39 +134,6 @@ function FileView(props: { file: FileItem }) {
       onCancel()
     }
   }, [blobDigest])
-  const open = useCallback(async () => {
-    if (blobUrl) {
-      window.open(blobUrl, '_blank')
-    } else {
-      const db = getFilesDatabase()
-      const blob = await db.getAttachment(file._id, 'blob')
-      window.open(URL.createObjectURL(blob), '_blank')
-    }
-  }, [file, blobUrl])
-  const download = useCallback(async () => {
-    const db = getFilesDatabase()
-    const blob = ((await db.getAttachment(file._id, 'blob')) as unknown) as Blob
-    triggerDownload(blob, file.name, blob.type)
-  }, [file])
-  const saveAs = useCallback(async () => {
-    const db = getFilesDatabase()
-    const blob = ((await db.getAttachment(file._id, 'blob')) as unknown) as Blob
-    const extnameMatch = file.name.match(/\.\w+$/)
-    const handle = await (window as any).showSaveFilePicker({
-      types: [
-        {
-          description: file.type,
-          accept: { [file.type]: extnameMatch ? [extnameMatch[0]] : [] },
-        },
-      ],
-    })
-    const stream = await handle.createWritable()
-    try {
-      await stream.write(blob)
-    } finally {
-      await stream.close()
-    }
-  }, [file])
   const renderMenuItem = (text: string, action?: () => void) => {
     return (
       <MenuItem
@@ -167,12 +188,14 @@ function FileView(props: { file: FileItem }) {
         aria-label="File actions"
         className="bg-#090807 border border-#656463"
       >
-        {renderMenuItem('Open with browser', open)}
-        {renderMenuItem('Download', download)}
-        {renderMenuItem('Save as', saveAs)}
-        <MenuSeparator />
-        {renderMenuItem('Delete')}
-        {renderMenuItem('Rename')}
+        {fileActions.map((action) =>
+          renderMenuItem(
+            action.label,
+            action.action &&
+              blobUrl &&
+              (() => action.action(file, blobInfo.blob, blobUrl))
+          )
+        )}
       </Menu>
     </li>
   )
