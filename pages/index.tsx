@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useQueryClient } from 'react-query'
 import {
   FileDbEntry,
@@ -8,23 +8,30 @@ import {
 } from '../src/db'
 import Files from '../src/Files'
 
-export default function Home() {
+function useFileImporter() {
   const queryClient = useQueryClient()
   const queryClientRef = useRef(queryClient)
   queryClientRef.current = queryClient
+
+  return useCallback(async function importFiles(files: File[]) {
+    const db = getFilesDatabase()
+    try {
+      await Promise.all(
+        Array.from(files).map(async (file) => {
+          const result = await addFile(db, file, file.name)
+        })
+      )
+    } finally {
+      queryClientRef.current.invalidateQueries()
+    }
+  }, [])
+}
+
+export default function Home() {
+  const importFiles = useFileImporter()
   useEffect(() => {
     const transfer = async (dataTransfer: DataTransfer) => {
-      const db = getFilesDatabase()
-      try {
-        await Promise.all(
-          Array.from(dataTransfer.files).map(async (file) => {
-            const result = await addFile(db, file, file.name)
-            console.log(result)
-          })
-        )
-      } finally {
-        queryClientRef.current.invalidateQueries()
-      }
+      return importFiles(Array.from(dataTransfer.files))
     }
     const onPaste = (e: ClipboardEvent): void => {
       transfer(e.clipboardData)
