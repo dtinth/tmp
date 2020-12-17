@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { useCallback, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useQueryClient } from 'react-query'
 import {
   FileDbEntry,
@@ -7,25 +7,7 @@ import {
   getShareTargetDatabase,
 } from '../src/db'
 import Files from '../src/Files'
-
-function useFileImporter() {
-  const queryClient = useQueryClient()
-  const queryClientRef = useRef(queryClient)
-  queryClientRef.current = queryClient
-
-  return useCallback(async function importFiles(files: File[]) {
-    const db = getFilesDatabase()
-    try {
-      await Promise.all(
-        Array.from(files).map(async (file) => {
-          const result = await addFile(db, file, file.name)
-        })
-      )
-    } finally {
-      queryClientRef.current.invalidateQueries()
-    }
-  }, [])
-}
+import useFileImporter from '../src/useFileImporter'
 
 export default function Home() {
   const importFiles = useFileImporter()
@@ -68,7 +50,7 @@ export default function Home() {
   )
 }
 
-async function addFile(
+export async function addFile(
   db: PouchDB.Database<FileDbEntry>,
   blob: Blob,
   name: string,
