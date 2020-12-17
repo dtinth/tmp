@@ -94,6 +94,25 @@ function FileView(props: { file: FileItem }) {
     const blob = ((await db.getAttachment(file._id, 'blob')) as unknown) as Blob
     triggerDownload(blob, file.name, blob.type)
   }, [file])
+  const saveAs = useCallback(async () => {
+    const db = getFilesDatabase()
+    const blob = ((await db.getAttachment(file._id, 'blob')) as unknown) as Blob
+    const extnameMatch = file.name.match(/\.\w+$/)
+    const handle = await (window as any).showSaveFilePicker({
+      types: [
+        {
+          description: file.type,
+          accept: { [file.type]: extnameMatch ? [extnameMatch[0]] : [] },
+        },
+      ],
+    })
+    const stream = await handle.createWritable()
+    try {
+      await stream.write(blob)
+    } finally {
+      await stream.close()
+    }
+  }, [file])
   const renderMenuItem = (text: string, action?: () => void) => {
     return (
       <MenuItem
@@ -150,7 +169,7 @@ function FileView(props: { file: FileItem }) {
       >
         {renderMenuItem('Open with browser', open)}
         {renderMenuItem('Download', download)}
-        {renderMenuItem('Save as')}
+        {renderMenuItem('Save as', saveAs)}
         <MenuSeparator />
         {renderMenuItem('Delete')}
         {renderMenuItem('Rename')}
