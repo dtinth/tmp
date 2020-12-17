@@ -47,8 +47,14 @@ function useFiles(): { isLoading: any; error: any; data: any } {
 
 interface FileAction {
   label: string
+  when?: (file: FileItem) => boolean
   action?: (file: FileItem, blob: Blob, blobUrl: string) => Promise<void>
 }
+
+/**
+ * List of file types that can be opened directly using browser.
+ */
+const openable = new Set(['image/png', 'image/jpeg', 'image/gif', 'image/ico'])
 
 const fileActions: FileAction[] = [
   {
@@ -56,6 +62,7 @@ const fileActions: FileAction[] = [
     action: async (_file, _blob, blobUrl) => {
       window.open(blobUrl, '_blank')
     },
+    when: (file) => openable.has(file.type),
   },
   {
     label: 'Download',
@@ -88,7 +95,10 @@ const fileActions: FileAction[] = [
 ]
 
 function useFileActions(file: FileItem) {
-  return fileActions
+  return useMemo(
+    () => fileActions.filter((action) => !action.when || action.when(file)),
+    [file]
+  )
 }
 
 function FileList(props: { files: FileItem[] }) {
