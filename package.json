@@ -15,6 +15,7 @@
     "downloadjs": "^1.4.7",
     "next": "10.0.3",
     "next-pwa": "^5.0.0",
+    "noty": "^3.2.0-beta",
     "postcss": "^8.2.1",
     "pouchdb": "^7.2.2",
     "react": "17.0.1",
