@@ -45,7 +45,16 @@ function useFiles(): { isLoading: any; error: any; data: any } {
   })
 }
 
+enum FileActionGroup {
+  Open = 'open',
+  Download = 'download',
+  SaveAs = 'save-as',
+  Delete = 'delete',
+  Rename = 'rename',
+}
+
 interface FileAction {
+  group: FileActionGroup
   label: string
   when?: (file: FileItem) => boolean
   action?: (file: FileItem, blob: Blob, blobUrl: string) => Promise<void>
@@ -58,6 +67,7 @@ const openable = new Set(['image/png', 'image/jpeg', 'image/gif', 'image/ico'])
 
 const fileActions: FileAction[] = [
   {
+    group: FileActionGroup.Open,
     label: 'Open with browser',
     action: async (_file, _blob, blobUrl) => {
       window.open(blobUrl, '_blank')
@@ -65,12 +75,14 @@ const fileActions: FileAction[] = [
     when: (file) => openable.has(file.type),
   },
   {
+    group: FileActionGroup.Download,
     label: 'Download',
     action: async (file, blob, _blobUrl) => {
       triggerDownload(blob, file.name, blob.type)
     },
   },
   {
+    group: FileActionGroup.SaveAs,
     label: 'Save as',
     action: async (file, blob, _blobUrl) => {
       const extnameMatch = file.name.match(/\.\w+$/)
@@ -90,8 +102,14 @@ const fileActions: FileAction[] = [
       }
     },
   },
-  { label: 'Delete' },
-  { label: 'Rename' },
+  {
+    group: FileActionGroup.Delete,
+    label: 'Delete',
+  },
+  {
+    group: FileActionGroup.Rename,
+    label: 'Rename',
+  },
 ]
 
 function useFileActions(file: FileItem) {
@@ -159,6 +177,18 @@ function FileView(props: { file: FileItem }) {
       </MenuItem>
     )
   }
+  const renderGroup = (name: FileActionGroup) => {
+    return fileActions
+      .filter((action) => action.group === name)
+      .map((action) =>
+        renderMenuItem(
+          action.label,
+          action.action &&
+            blobUrl &&
+            (() => action.action(file, blobInfo.blob, blobUrl))
+        )
+      )
+  }
   return (
     <li
       data-file-id={file._id}
@@ -198,14 +228,12 @@ function FileView(props: { file: FileItem }) {
         aria-label="File actions"
         className="bg-#090807 border border-#656463"
       >
-        {fileActions.map((action) =>
-          renderMenuItem(
-            action.label,
-            action.action &&
-              blobUrl &&
-              (() => action.action(file, blobInfo.blob, blobUrl))
-          )
-        )}
+        {renderGroup(FileActionGroup.Open)}
+        {renderGroup(FileActionGroup.Download)}
+        {renderGroup(FileActionGroup.SaveAs)}
+        <MenuSeparator />
+        {renderGroup(FileActionGroup.Delete)}
+        {renderGroup(FileActionGroup.Rename)}
       </Menu>
     </li>
   )
