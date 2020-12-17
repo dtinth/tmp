@@ -97,7 +97,7 @@ function FileView(props: { file: FileItem }) {
       <MenuItem
         {...menu}
         onClick={action}
-        className="block w-full text-left px-2 py-1"
+        className="block w-full text-left px-2 py-1 focus:bg-#454443"
       >
         {text}
       </MenuItem>
