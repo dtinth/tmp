@@ -84,6 +84,7 @@ const fileActions: FileAction[] = [
   {
     group: FileActionGroup.SaveAs,
     label: 'Save as',
+    when: () => 'showSaveFilePicker' in window,
     action: async (file, blob, _blobUrl) => {
       const extnameMatch = file.name.match(/\.\w+$/)
       const handle = await (window as any).showSaveFilePicker({
