@@ -276,6 +276,7 @@ function FileView(props: { file: FileItem }) {
         {renderGroup(FileActionGroup.Open)}
         {renderGroup(FileActionGroup.Download)}
         {renderGroup(FileActionGroup.SaveAs)}
+        {renderGroup(FileActionGroup.Share)}
         <MenuSeparator />
         {renderGroup(FileActionGroup.Delete)}
         {renderGroup(FileActionGroup.Rename)}
