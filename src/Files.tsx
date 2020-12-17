@@ -92,6 +92,17 @@ function FileView(props: { file: FileItem }) {
     const blob = ((await db.getAttachment(file._id, 'blob')) as unknown) as Blob
     triggerDownload(blob, file.name, blob.type)
   }, [file])
+  const renderMenuItem = (text: string, action: () => void) => {
+    return (
+      <MenuItem
+        {...menu}
+        onClick={action}
+        className="block w-full text-left px-2 py-1"
+      >
+        {text}
+      </MenuItem>
+    )
+  }
   return (
     <li
       data-file-id={file._id}
@@ -129,16 +140,8 @@ function FileView(props: { file: FileItem }) {
         aria-label="File actions"
         className="bg-#090807 border border-#656463"
       >
-        <MenuItem {...menu} onClick={open} className="block w-full">
-          Open with browser
-        </MenuItem>
-        <MenuItem
-          {...menu}
-          onClick={download}
-          className="block w-full text-left"
-        >
-          Download
-        </MenuItem>
+        {renderMenuItem('Open with browser', open)}
+        {renderMenuItem('Download', download)}
       </Menu>
     </li>
   )
