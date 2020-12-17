@@ -12,6 +12,7 @@ import {
 } from 'reakit/Menu'
 import triggerDownload from 'downloadjs'
 import classNames from 'classnames'
+import useFileImporter from './useFileImporter'
 
 if (typeof HTMLElement !== undefined) {
   import('@github/time-elements')
@@ -39,9 +40,11 @@ function useFiles(): { isLoading: any; error: any; data: any } {
   return useQuery('files', async () => {
     const db = getFilesDatabase()
     const docs = await db.allDocs({ include_docs: true })
-    return docs.rows.flatMap((row) => {
-      return row.doc ? [row.doc] : []
-    })
+    return docs.rows
+      .flatMap((row) => {
+        return row.doc ? [row.doc] : []
+      })
+      .sort((a, b) => (a.added < b.added ? -1 : 1))
   })
 }
 
@@ -139,6 +142,7 @@ function FileList(props: { files: FileItem[] }) {
   return (
     <div>
       <ul>
+        <NewItemView />
         {[...props.files].map((file) => (
           <FileView key={file._id} file={file} />
         ))}
@@ -265,6 +269,61 @@ function FileView(props: { file: FileItem }) {
         <MenuSeparator />
         {renderGroup(FileActionGroup.Delete)}
         {renderGroup(FileActionGroup.Rename)}
+      </Menu>
+    </li>
+  )
+}
+
+function NewItemView(props: {}) {
+  const menu = useMenuState()
+  const importFiles = useFileImporter()
+  const renderMenuItem = (text: string, action?: () => void) => {
+    return (
+      <MenuItem
+        {...menu}
+        disabled={!action}
+        onClick={action}
+        className={classNames(
+          'block w-full text-left px-2 py-1 focus:bg-#454443',
+          !action && 'text-#656463'
+        )}
+      >
+        {text}
+      </MenuItem>
+    )
+  }
+  return (
+    <li>
+      <MenuButton {...menu} className="flex items-center my-1 text-left">
+        <div className="flex-none mr-1 text-#8b8685">
+          <div
+            className="text-xl"
+            style={{
+              width: 32,
+              height: 32,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            [+]
+          </div>
+        </div>
+        <div className="flex-auto p-2">
+          <h2 className="leading-tight">New item</h2>
+          <p className="text-#8b8685 text-xs">Create or import files</p>
+        </div>
+      </MenuButton>
+      <Menu
+        {...menu}
+        aria-label="File actions"
+        className="bg-#090807 border border-#656463"
+      >
+        {renderMenuItem('Import from your computer', async () => {
+          const { fileOpen } = await import('browser-nativefs')
+          const files = await fileOpen({ multiple: true })
+          await importFiles(files)
+        })}
       </Menu>
     </li>
   )
