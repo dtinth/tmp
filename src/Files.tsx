@@ -13,6 +13,7 @@ import {
 import triggerDownload from 'downloadjs'
 import classNames from 'classnames'
 import useFileImporter from './useFileImporter'
+import { openWith } from './Integrations'
 
 if (typeof HTMLElement !== undefined) {
   import('@github/time-elements')
@@ -26,7 +27,7 @@ export default function Files() {
   return <FileList files={data} />
 }
 
-interface FileItem extends FileDbEntry {
+export interface FileItem extends FileDbEntry {
   _rev: string
   _id: string
   _attachments: {
@@ -50,6 +51,7 @@ function useFiles(): { isLoading: any; error: any; data: any } {
 
 enum FileActionGroup {
   Open = 'open',
+  OpenWith = 'open-with',
   Download = 'download',
   Share = 'share',
   SaveAs = 'save-as',
@@ -138,6 +140,14 @@ const fileActions: FileAction[] = [
   {
     group: FileActionGroup.Rename,
     label: 'Rename',
+  },
+  {
+    group: FileActionGroup.OpenWith,
+    label: 'JSON Viewer',
+    when: (file) => file.type === 'application/json',
+    action: async ({ file, updateDb }) => {
+      openWith(file, 'https://jsonviewer.glitch.me/')
+    },
   },
 ]
 
@@ -277,6 +287,7 @@ function FileView(props: { file: FileItem }) {
         {renderGroup(FileActionGroup.Download)}
         {renderGroup(FileActionGroup.SaveAs)}
         {renderGroup(FileActionGroup.Share)}
+        {renderGroup(FileActionGroup.OpenWith)}
         <MenuSeparator />
         {renderGroup(FileActionGroup.Delete)}
         {renderGroup(FileActionGroup.Rename)}

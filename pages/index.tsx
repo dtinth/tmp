@@ -5,6 +5,7 @@ import { getFilesDatabase, getShareTargetDatabase } from '../src/db'
 import Files from '../src/Files'
 import useFileImporter from '../src/useFileImporter'
 import { addFile } from '../src/addFile'
+import { IntegrationsWorker } from '../src/Integrations'
 
 export default function Home() {
   const importFiles = useFileImporter()
@@ -43,6 +44,7 @@ export default function Home() {
       or paste in files and images, and they will appear here.
       <Files />
       <ShareTargetWorker />
+      <IntegrationsWorker />
     </div>
   )
 }
