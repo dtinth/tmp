@@ -144,7 +144,9 @@ const fileActions: FileAction[] = [
   {
     group: FileActionGroup.OpenWith,
     label: 'JSON Viewer',
-    when: (file) => file.type === 'application/json',
+    when: (file) =>
+      file.type === 'application/json' ||
+      /\.(?:json|ndjson|bmson)$/i.test(file.name),
     action: async ({ file, updateDb }) => {
       openWith(file, 'https://jsonviewer.glitch.me/')
     },
