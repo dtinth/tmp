@@ -24,12 +24,23 @@ export function IntegrationsWorker() {
         }
         const sessionState = JSON.parse(session)
         const db = getFilesDatabase()
-        const file = await db.getAttachment(sessionState.openedFile, 'blob')
+        const doc = await db.get(sessionState.openedFile, {
+          binary: true,
+          attachments: true,
+        })
         fromWindow.postMessage(
           {
             jsonrpc: '2.0',
             id: e.data.id,
-            result: { blob: file },
+            result: {
+              blob: (doc._attachments.blob as any).data,
+              file: {
+                _rev: doc._rev,
+                _id: doc._id,
+                name: doc.name,
+                type: doc.type,
+              },
+            },
           },
           e.origin
         )
