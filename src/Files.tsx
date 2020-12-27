@@ -147,8 +147,16 @@ const fileActions: FileAction[] = [
     when: (file) =>
       file.type === 'application/json' ||
       /\.(?:json|ndjson|bmson)$/i.test(file.name),
-    action: async ({ file, updateDb }) => {
+    action: async ({ file }) => {
       openWith(file, 'https://jsonviewer.glitch.me/')
+    },
+  },
+  {
+    group: FileActionGroup.OpenWith,
+    label: 'Video player',
+    when: (file) => file.type === 'video/mp4',
+    action: async ({ file }) => {
+      openWith(file, 'https://vdo.glitch.me/')
     },
   },
 ]
