@@ -16,7 +16,7 @@ export function IntegrationsWorker() {
   useEffect(() => {
     window.addEventListener('message', async (e) => {
       const fromWindow = (e.source as unknown) as Window
-      if (e.data.method === 'tmp.getFile') {
+      if (e.data.method === 'tmp.getOpenedFile') {
         const sessionId = e.data.params.sessionId
         const session = sessionStorage[`session:${sessionId}`]
         if (!session) {
