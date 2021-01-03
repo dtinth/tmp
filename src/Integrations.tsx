@@ -4,6 +4,40 @@ import { getFilesDatabase } from './db'
 import { FileItem } from './Files'
 import { JsonRpcDefinition, JsonRpcPayloadChecker } from './JsonRpc'
 
+interface TmpManifest {
+  name: string
+  description: string
+  contributes: {
+    integrations: {
+      [integrationName: string]: {
+        // https://html.spec.whatwg.org/multipage/input.html#attr-input-accept
+        accept: string[]
+        title: string
+        url: string
+      }
+    }
+  }
+}
+
+export const builtinExtension: TmpManifest = {
+  name: 'Built-in',
+  description: 'The built-in extension provides a few built-in integrations.',
+  contributes: {
+    integrations: {
+      jsonViewer: {
+        title: 'JSON Viewer',
+        accept: ['application/json', '.json', '.ndjson', '.bmson'],
+        url: 'https://jsonviewer.glitch.me/',
+      },
+      videoPlayer: {
+        title: 'Video player',
+        accept: ['video/*'],
+        url: 'https://vdo.glitch.me/',
+      },
+    },
+  },
+}
+
 interface RpcInterface extends JsonRpcDefinition {
   'tmp/getOpenedFile': {
     params: {

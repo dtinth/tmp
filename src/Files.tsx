@@ -13,7 +13,7 @@ import {
 import triggerDownload from 'downloadjs'
 import classNames from 'classnames'
 import useFileImporter from './useFileImporter'
-import { openWith } from './Integrations'
+import { builtinExtension, openWith } from './Integrations'
 
 if (typeof HTMLElement !== undefined) {
   import('@github/time-elements')
@@ -141,31 +141,37 @@ const fileActions: FileAction[] = [
     group: FileActionGroup.Rename,
     label: 'Rename',
   },
-  {
-    group: FileActionGroup.OpenWith,
-    label: 'JSON Viewer',
-    when: (file) =>
-      file.type === 'application/json' ||
-      /\.(?:json|ndjson|bmson)$/i.test(file.name),
-    action: async ({ file }) => {
-      openWith(file, 'https://jsonviewer.glitch.me/')
-    },
-  },
-  {
-    group: FileActionGroup.OpenWith,
-    label: 'Video player',
-    when: (file) => file.type === 'video/mp4',
-    action: async ({ file }) => {
-      openWith(file, 'https://vdo.glitch.me/')
-    },
-  },
 ]
 
 function useFileActions(file: FileItem) {
-  return useMemo(
-    () => fileActions.filter((action) => !action.when || action.when(file)),
-    [file]
-  )
+  return useMemo(() => {
+    const actions = [...fileActions]
+    for (const [k, v] of Object.entries(
+      builtinExtension.contributes.integrations || []
+    )) {
+      actions.push({
+        group: FileActionGroup.OpenWith,
+        label: v.title,
+        when: (file) =>
+          (v.accept || []).some((pattern) => {
+            if (pattern.startsWith('.')) {
+              return (file.name.match(/\.\w+$/) || [])[0] === pattern
+            }
+            if (pattern.endsWith('/*')) {
+              return file.type.startsWith(pattern.slice(0, -1))
+            }
+            if (pattern.includes('/')) {
+              return file.type === pattern
+            }
+            return false
+          }),
+        action: async ({ file }) => {
+          openWith(file, v.url)
+        },
+      })
+    }
+    return actions.filter((action) => !action.when || action.when(file))
+  }, [file])
 }
 
 function FileList(props: { files: FileItem[] }) {
