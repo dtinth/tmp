@@ -33,6 +33,20 @@ async function addExtension(url: string) {
   const { data: manifest } = await axios.get(getManifestUrl(url), {
     responseType: 'json',
   })
+  if (!manifest.name) {
+    throw new Error('Invalid manifest: Missing "name" property.')
+  }
+  if (typeof manifest.name !== 'string') {
+    throw new Error('Invalid manifest: "name" property is not a string.')
+  }
+  if (!manifest.contributes) {
+    throw new Error('Invalid manifest: Missing "contributes" property.')
+  }
+  if (typeof manifest.contributes !== 'object') {
+    throw new Error(
+      'Invalid manifest: "contributes" property is not an object.'
+    )
+  }
   console.log(manifest)
 }
 
