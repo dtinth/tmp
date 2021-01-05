@@ -6,6 +6,7 @@ import Files from '../src/Files'
 import useFileImporter from '../src/useFileImporter'
 import { addFile } from '../src/addFile'
 import { IntegrationsWorker } from '../src/Integrations'
+import Settings from '../src/Settings'
 
 export default function Home() {
   const importFiles = useFileImporter()
@@ -14,6 +15,12 @@ export default function Home() {
       return importFiles(Array.from(dataTransfer.files))
     }
     const onPaste = (e: ClipboardEvent): void => {
+      if (
+        document.activeElement &&
+        ['INPUT', 'TEXTAREA'].includes(document.activeElement.nodeName)
+      ) {
+        return
+      }
       transfer(e.clipboardData)
       e.preventDefault()
     }
@@ -43,6 +50,7 @@ export default function Home() {
       <strong>Welcome to your web-based local file storage.</strong> Just drop
       or paste in files and images, and they will appear here.
       <Files />
+      <Settings />
       <ShareTargetWorker />
       <IntegrationsWorker />
     </div>
