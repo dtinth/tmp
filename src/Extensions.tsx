@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { useQuery } from 'react-query'
+import { builtinExtension } from './BuiltinExtension'
 import { getExtensionsDatabase } from './db'
 import { queryClient } from './GlobalReactQueryClient'
 
@@ -11,6 +12,15 @@ const queryExtensions = async () => {
 
 export function useExtensions() {
   return useQuery('extensions', queryExtensions, { suspense: true }).data
+}
+
+export function useActiveExtensions() {
+  return [
+    builtinExtension,
+    ...(useQuery('extensions', queryExtensions).data || []).flatMap((e) =>
+      e.manifest ? [e.manifest] : []
+    ),
+  ]
 }
 
 export async function addExtension(url: string) {

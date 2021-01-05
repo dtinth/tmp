@@ -13,7 +13,8 @@ import {
 import triggerDownload from 'downloadjs'
 import classNames from 'classnames'
 import useFileImporter from './useFileImporter'
-import { builtinExtension, openWith } from './Integrations'
+import { useActiveExtensions } from './Extensions'
+import { openWith } from './Integrations'
 
 if (typeof HTMLElement !== undefined) {
   import('@github/time-elements')
@@ -144,37 +145,40 @@ const fileActions: FileAction[] = [
 ]
 
 function useFileActions(file: FileItem) {
+  const activeExtensions = useActiveExtensions()
   return useMemo(() => {
     const actions = [...fileActions]
-    for (const [k, v] of Object.entries(
-      builtinExtension.contributes.integrations || []
-    )) {
-      actions.push({
-        group: FileActionGroup.OpenWith,
-        label: v.title,
-        when: (file) =>
-          (v.accept || []).some((pattern) => {
-            if (pattern === '*' || pattern === '*/*') {
-              return true
-            }
-            if (pattern.startsWith('.')) {
-              return (file.name.match(/\.\w+$/) || [])[0] === pattern
-            }
-            if (pattern.endsWith('/*')) {
-              return file.type.startsWith(pattern.slice(0, -1))
-            }
-            if (pattern.includes('/')) {
-              return file.type === pattern
-            }
-            return false
-          }),
-        action: async ({ file }) => {
-          openWith(file, v.url)
-        },
-      })
+    for (const extension of activeExtensions) {
+      for (const [k, v] of Object.entries(
+        extension.contributes.integrations || []
+      )) {
+        actions.push({
+          group: FileActionGroup.OpenWith,
+          label: v.title,
+          when: (file) =>
+            (v.accept || []).some((pattern) => {
+              if (pattern === '*' || pattern === '*/*') {
+                return true
+              }
+              if (pattern.startsWith('.')) {
+                return (file.name.match(/\.\w+$/) || [])[0] === pattern
+              }
+              if (pattern.endsWith('/*')) {
+                return file.type.startsWith(pattern.slice(0, -1))
+              }
+              if (pattern.includes('/')) {
+                return file.type === pattern
+              }
+              return false
+            }),
+          action: async ({ file }) => {
+            openWith(file, v.url)
+          },
+        })
+      }
     }
     return actions.filter((action) => !action.when || action.when(file))
-  }, [file])
+  }, [file, activeExtensions])
 }
 
 function FileList(props: { files: FileItem[] }) {
