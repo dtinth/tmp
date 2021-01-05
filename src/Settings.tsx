@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { Suspense, useEffect, useRef, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useQuery } from 'react-query'
@@ -28,13 +29,33 @@ export default function Settings() {
   )
 }
 
+async function addExtension(url: string) {
+  const { data: manifest } = await axios.get(getManifestUrl(url), {
+    responseType: 'json',
+  })
+  console.log(manifest)
+}
+
+function getManifestUrl(url: string): string {
+  return url.replace(/\?.*/, '').replace(/\/?$/, '/tmp-manifest.json')
+}
+
 function ExtensionsSettings() {
   const extensions = useExtensions()
   const newUrlInput = useRef<HTMLInputElement>()
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const url = newUrlInput.current.value
-    alert(url)
+    if (!url) {
+      alert('Please enter a URL')
+      return
+    }
+    try {
+      await addExtension(url)
+    } catch (error) {
+      alert('Unable to add extension: ' + error)
+      console.error(error)
+    }
   }
   return (
     <div className="flex items-baseline mb-4 flex-wrap">
@@ -57,7 +78,7 @@ function ExtensionsSettings() {
           <div className="flex-auto">
             <input
               ref={newUrlInput}
-              type="text"
+              type="url"
               placeholder="URL"
               className="block w-full border py-1 px-2 rounded bg-#090807 border-#454443 hover:border-#656463 shadow placeholder-#8b8685"
             />
