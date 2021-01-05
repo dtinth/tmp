@@ -154,6 +154,9 @@ function useFileActions(file: FileItem) {
         label: v.title,
         when: (file) =>
           (v.accept || []).some((pattern) => {
+            if (pattern === '*' || pattern === '*/*') {
+              return true
+            }
             if (pattern.startsWith('.')) {
               return (file.name.match(/\.\w+$/) || [])[0] === pattern
             }
