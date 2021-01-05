@@ -1,9 +1,6 @@
-import axios from 'axios'
 import { Suspense, useEffect, useRef, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
-import { useQuery } from 'react-query'
-import { getExtensionsDatabase } from './db'
-import { queryClient } from './GlobalReactQueryClient'
+import { addExtension, useExtensions } from './Extensions'
 
 function ClientOnly({ children }) {
   const [isComponentMounted, setIsComponentMounted] = useState(false)
@@ -28,42 +25,6 @@ export default function Settings() {
       </ClientOnly>
     </div>
   )
-}
-
-async function addExtension(url: string) {
-  const { data: manifest } = await axios.get(getManifestUrl(url), {
-    responseType: 'json',
-  })
-  if (!manifest.name) {
-    throw new Error('Invalid manifest: Missing "name" property.')
-  }
-  if (typeof manifest.name !== 'string') {
-    throw new Error('Invalid manifest: "name" property is not a string.')
-  }
-  if (!manifest.contributes) {
-    throw new Error('Invalid manifest: Missing "contributes" property.')
-  }
-  if (typeof manifest.contributes !== 'object') {
-    throw new Error(
-      'Invalid manifest: "contributes" property is not an object.'
-    )
-  }
-  const extensionsDb = getExtensionsDatabase()
-  const _id = `extension/${url}`
-  await extensionsDb.put({
-    _id,
-    url,
-    manifest,
-    latestFetch: {
-      fetchedAt: new Date().toJSON(),
-    },
-  })
-  queryClient.invalidateQueries('extensions')
-  console.log(manifest)
-}
-
-function getManifestUrl(url: string): string {
-  return url.replace(/\?.*/, '').replace(/\/?$/, '/tmp-manifest.json')
 }
 
 function ExtensionsSettings() {
@@ -116,16 +77,4 @@ function ExtensionsSettings() {
       </div>
     </div>
   )
-}
-
-function useExtensions() {
-  return useQuery(
-    'extensions',
-    async () => {
-      const extensionsDb = getExtensionsDatabase()
-      const docs = await extensionsDb.allDocs({ include_docs: true })
-      return docs.rows.flatMap((row) => (row.doc ? [row.doc] : []))
-    },
-    { suspense: true }
-  ).data
 }
