@@ -141,6 +141,17 @@ const fileActions: FileAction[] = [
   {
     group: FileActionGroup.Rename,
     label: 'Rename',
+    action: async ({ file, updateDb }) => {
+      const name = prompt('New name', file.name)
+      if (!name) {
+        return
+      }
+      updateDb(async (db) => {
+        const doc = await db.get(file._id)
+        doc.name = name
+        await db.put(doc)
+      })
+    },
   },
 ]
 
