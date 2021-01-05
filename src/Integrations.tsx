@@ -3,23 +3,9 @@ import { v4 as uuidv4 } from 'uuid'
 import { getFilesDatabase } from './db'
 import { FileItem } from './Files'
 import { JsonRpcDefinition, JsonRpcPayloadChecker } from './JsonRpc'
+import { ExtensionManifest } from './ExtensionManifest'
 
-interface TmpManifest {
-  name: string
-  description: string
-  contributes: {
-    integrations: {
-      [integrationName: string]: {
-        // https://html.spec.whatwg.org/multipage/input.html#attr-input-accept
-        accept: string[]
-        title: string
-        url: string
-      }
-    }
-  }
-}
-
-export const builtinExtension: TmpManifest = {
+export const builtinExtension: ExtensionManifest = {
   name: 'Built-in',
   description: 'The built-in extension provides a few built-in integrations.',
   contributes: {
