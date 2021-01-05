@@ -1,7 +1,7 @@
 import '../styles/globals.css'
 
-import { QueryClient, QueryClientProvider } from 'react-query'
-const queryClient = new QueryClient()
+import { QueryClientProvider } from 'react-query'
+import { queryClient } from '../src/GlobalReactQueryClient'
 
 function MyApp({ Component, pageProps }) {
   return (
