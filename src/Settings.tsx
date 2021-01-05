@@ -3,6 +3,7 @@ import { Suspense, useEffect, useRef, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useQuery } from 'react-query'
 import { getExtensionsDatabase } from './db'
+import { queryClient } from './GlobalReactQueryClient'
 
 function ClientOnly({ children }) {
   const [isComponentMounted, setIsComponentMounted] = useState(false)
@@ -47,6 +48,17 @@ async function addExtension(url: string) {
       'Invalid manifest: "contributes" property is not an object.'
     )
   }
+  const extensionsDb = getExtensionsDatabase()
+  const _id = `extension/${url}`
+  await extensionsDb.put({
+    _id,
+    url,
+    manifest,
+    latestFetch: {
+      fetchedAt: new Date().toJSON(),
+    },
+  })
+  queryClient.invalidateQueries('extensions')
   console.log(manifest)
 }
 

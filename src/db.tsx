@@ -18,7 +18,7 @@ export interface ShareTargetEntry {
 export interface ExtensionEntry {
   url: string
   manifest?: ExtensionManifest
-  latestFetch?: {
+  latestFetch: {
     error?: string
     fetchedAt: string
   }
