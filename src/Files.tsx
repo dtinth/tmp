@@ -14,7 +14,7 @@ import triggerDownload from 'downloadjs'
 import classNames from 'classnames'
 import useFileImporter from './useFileImporter'
 import { useActiveExtensions } from './Extensions'
-import { openWith } from './Integrations'
+import { openWith, newWith } from './Integrations'
 
 if (typeof HTMLElement !== undefined) {
   import('@github/time-elements')
@@ -65,6 +65,11 @@ interface FileAction {
   label: string
   when?: (file: FileItem) => boolean
   action?: (context: FileActionContext) => Promise<void>
+}
+
+interface NewAction {
+  label: string
+  action?: () => Promise<void>
 }
 
 interface FileActionContext {
@@ -154,6 +159,27 @@ const fileActions: FileAction[] = [
     },
   },
 ]
+
+function useNewActions() {
+  const activeExtensions = useActiveExtensions()
+  return useMemo(() => {
+    const actions: NewAction[] = []
+    for (const extension of activeExtensions) {
+      for (const [k, v] of Object.entries(
+        extension.contributes.integrations || []
+      )) {
+        if (v.accept && v.accept.length > 0) continue
+        actions.push({
+          label: v.title,
+          action: async () => {
+            newWith(v.url)
+          },
+        })
+      }
+    }
+    return actions
+  }, [activeExtensions])
+}
 
 function useFileActions(file: FileItem) {
   const activeExtensions = useActiveExtensions()
@@ -332,6 +358,7 @@ function FileView(props: { file: FileItem }) {
 
 function NewItemView(props: {}) {
   const menu = useMenuState()
+  const newActions = useNewActions()
   const importFiles = useFileImporter()
   const renderMenuItem = (text: string, action?: () => void) => {
     return (
@@ -385,6 +412,11 @@ function NewItemView(props: {}) {
           })
           await importFiles(files)
         })}
+        {newActions.map((action, index) => (
+          <React.Fragment key={index}>
+            {renderMenuItem(action.label, action.action)}
+          </React.Fragment>
+        ))}
       </Menu>
     </li>
   )

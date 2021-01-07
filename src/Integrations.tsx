@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
+import { addFile } from './addFile'
 import { getFilesDatabase } from './db'
 import { FileItem } from './Files'
 import { JsonRpcDefinition, JsonRpcPayloadChecker } from './JsonRpc'
@@ -19,6 +20,14 @@ interface RpcInterface extends JsonRpcDefinition {
       }
     }
   }
+  'tmp/newFile': {
+    params: {
+      sessionId: string
+      name: string
+      blob: Blob
+    }
+    result: {}
+  }
 }
 
 const rpc = new JsonRpcPayloadChecker<RpcInterface>()
@@ -32,16 +41,23 @@ export function openWith(file: FileItem, url: string) {
   window.open(url + '#tmpsessionid=' + sessionId)
 }
 
+export function newWith(url: string) {
+  const sessionId = uuidv4()
+  sessionStorage[`session:${sessionId}`] = JSON.stringify({
+    canSave: true,
+  })
+  window.open(url + '#tmpsessionid=' + sessionId)
+}
+
 export function IntegrationsWorker() {
   useEffect(() => {
     window.addEventListener('message', async (e) => {
       const fromWindow = (e.source as unknown) as Window
+
       if (rpc.isMethodCall(e.data, 'tmp/getOpenedFile')) {
         const sessionId = e.data.params.sessionId
         const session = sessionStorage[`session:${sessionId}`]
-        if (!session) {
-          return
-        }
+        if (!session) return
         const sessionState = JSON.parse(session)
         const db = getFilesDatabase()
         const doc = await db.get(sessionState.openedFile, {
@@ -60,6 +76,22 @@ export function IntegrationsWorker() {
           }),
           e.origin
         )
+        return
+      }
+
+      if (rpc.isMethodCall(e.data, 'tmp/newFile')) {
+        if (!(e.data.params.blob instanceof Blob)) return
+        if (!e.data.params.name || typeof e.data.params.name !== 'string') {
+          return
+        }
+        const sessionId = e.data.params.sessionId
+        const session = sessionStorage[`session:${sessionId}`]
+        if (!session) return
+        // const sessionState = JSON.parse(session)
+        const db = getFilesDatabase()
+        await addFile(db, e.data.params.blob, e.data.params.name)
+        fromWindow.postMessage(rpc.replyResult(e.data, {}), e.origin)
+        return
       }
     })
   }, [])
