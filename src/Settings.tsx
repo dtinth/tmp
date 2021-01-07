@@ -1,5 +1,6 @@
 import { Suspense, useEffect, useRef, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
+import { ExtensionEntry } from './db'
 import { addExtension, useExtensions } from './Extensions'
 
 function ClientOnly({ children }) {
@@ -56,7 +57,7 @@ function ExtensionsSettings() {
           <ul>
             {extensions.map((extension) => (
               <li key={extension._id} className="mb-2">
-                {extension.url}
+                <ExtensionView extension={extension} />
               </li>
             ))}
           </ul>
@@ -75,6 +76,20 @@ function ExtensionsSettings() {
           </button>
         </form>
       </div>
+    </div>
+  )
+}
+
+function ExtensionView(props: {
+  extension: PouchDB.Core.ExistingDocument<ExtensionEntry>
+}) {
+  const { extension } = props
+  return (
+    <div>
+      <div className="text-#bbeeff">
+        {extension.manifest?.name || extension.url}
+      </div>
+      <div className="truncate text-#8b8685 text-sm">{extension.url}</div>
     </div>
   )
 }

@@ -1,13 +1,9 @@
 import { useCallback, useRef } from 'react'
-import { useQueryClient } from 'react-query'
 import { getFilesDatabase } from './db'
 import { addFile } from './addFile'
+import { queryClient } from './GlobalReactQueryClient'
 
 export default function useFileImporter() {
-  const queryClient = useQueryClient()
-  const queryClientRef = useRef(queryClient)
-  queryClientRef.current = queryClient
-
   return useCallback(async function importFiles(files: File[]) {
     const db = getFilesDatabase()
     try {
@@ -17,7 +13,7 @@ export default function useFileImporter() {
         })
       )
     } finally {
-      queryClientRef.current.invalidateQueries()
+      queryClient.invalidateQueries('files')
     }
   }, [])
 }

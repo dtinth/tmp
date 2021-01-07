@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { addFile } from './addFile'
 import { getFilesDatabase } from './db'
 import { FileItem } from './Files'
+import { queryClient } from './GlobalReactQueryClient'
 import { JsonRpcDefinition, JsonRpcPayloadChecker } from './JsonRpc'
 
 interface RpcInterface extends JsonRpcDefinition {
@@ -90,6 +91,7 @@ export function IntegrationsWorker() {
         // const sessionState = JSON.parse(session)
         const db = getFilesDatabase()
         await addFile(db, e.data.params.blob, e.data.params.name)
+        queryClient.invalidateQueries('files')
         fromWindow.postMessage(rpc.replyResult(e.data, {}), e.origin)
         return
       }
