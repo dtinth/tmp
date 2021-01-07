@@ -55,6 +55,12 @@ export async function addExtension(url: string) {
   console.log(manifest)
 }
 
+export async function deleteExtension(id: string) {
+  const extensionsDb = getExtensionsDatabase()
+  await extensionsDb.remove(await extensionsDb.get(id))
+  queryClient.invalidateQueries('extensions')
+}
+
 function getManifestUrl(url: string): string {
   return url.replace(/\?.*/, '').replace(/\/?$/, '/tmp-manifest.json')
 }

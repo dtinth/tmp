@@ -1,7 +1,7 @@
 import { Suspense, useEffect, useRef, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ExtensionEntry } from './db'
-import { addExtension, useExtensions } from './Extensions'
+import { addExtension, deleteExtension, useExtensions } from './Extensions'
 
 function ClientOnly({ children }) {
   const [isComponentMounted, setIsComponentMounted] = useState(false)
@@ -57,7 +57,17 @@ function ExtensionsSettings() {
           <ul>
             {extensions.map((extension) => (
               <li key={extension._id} className="mb-2">
-                <ExtensionView extension={extension} />
+                <ExtensionView
+                  extension={extension}
+                  onDelete={() => {
+                    if (confirm('Do you want to delete this extension?')) {
+                      deleteExtension(extension._id)
+                    }
+                  }}
+                  onReload={() => {
+                    alert('Unimplemented')
+                  }}
+                />
               </li>
             ))}
           </ul>
@@ -82,12 +92,27 @@ function ExtensionsSettings() {
 
 function ExtensionView(props: {
   extension: PouchDB.Core.ExistingDocument<ExtensionEntry>
+  onDelete: () => void
+  onReload: () => void
 }) {
-  const { extension } = props
+  const { extension, onDelete, onReload } = props
   return (
     <div>
-      <div className="text-#bbeeff">
-        {extension.manifest?.name || extension.url}
+      <div className="flex items-baseline">
+        <div className="text-#bbeeff flex-auto truncate">
+          {extension.manifest?.name || extension.url}
+        </div>
+        <div className="flex-none">
+          <button className="ml-2 text-sm text-#8b8685" onClick={onDelete}>
+            ❌
+          </button>
+          <button className="ml-2 text-sm text-#8b8685" onClick={onReload}>
+            🔄
+          </button>
+        </div>
+      </div>
+      <div className="text-sm">
+        {extension.manifest?.description || '(no description given)'}
       </div>
       <div className="truncate text-#8b8685 text-sm">{extension.url}</div>
     </div>
