@@ -7,7 +7,7 @@ home: true
 [`tmp.spacet.me`](https://tmp.spacet.me) is a **web-based local file storage.**
 You can put files into it, and you can get files out of it.
 
-<r-grid columns=12>
+<r-grid columns=12 columns-s=6>
 <r-cell span=6>
 
 ## Putting files in
@@ -18,15 +18,28 @@ You can put files into it, and you can get files out of it.
 - [Share from other apps](builtin-share-target.html) (Android)
 
 </r-cell>
-<r-cell span=4>
+<r-cell span=6>
 
 ## Getting files out
 
-- [View in browser](builtin-browser.html)
 - [Download](builtin-download.html)
 - [Drag out files](builtin-drag.html)
 - [Save to disk](builtin-save.html)
 - [Share to other apps](builtin-share.html) (Android)
+
+</r-cell>
+<r-cell span=6>
+
+## Viewing files
+
+- [View in browser](builtin-browser.html)
+
+</r-cell>
+<r-cell span=6>
+
+## Manipulating files
+
+- <span class="ext">[Edit in Photopea](tmp-photopea.html)</span>
 
 </r-cell>
 </r-grid>
