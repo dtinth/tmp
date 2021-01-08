@@ -56,7 +56,7 @@ export function useExtensions() {
 export function useActiveExtensions() {
   return [
     ...(useQuery('extensions', queryExtensions).data || []).flatMap((e) =>
-      e.manifest ? [e.manifest] : []
+      e.manifest && !e.disabled ? [e.manifest] : []
     ),
   ]
 }
