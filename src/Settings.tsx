@@ -4,6 +4,7 @@ import { ExtensionEntry } from './db'
 import {
   addExtension,
   deleteExtension,
+  setExtensionDisabledFlag,
   updateExistingExtension,
   useExtensions,
 } from './Extensions'
@@ -79,7 +80,9 @@ function ExtensionsSettings() {
                   }
                   onReload={() => {
                     updateExistingExtension(extension._id)
-                    alert('Unimplemented')
+                  }}
+                  onSetDisabled={(disabled) => {
+                    setExtensionDisabledFlag(extension._id, disabled)
                   }}
                 />
               </li>
@@ -108,12 +111,25 @@ function ExtensionView(props: {
   extension: PouchDB.Core.ExistingDocument<ExtensionEntry>
   onDelete?: () => void
   onReload: () => void
+  onSetDisabled: (disabled: boolean) => void
 }) {
-  const { extension, onDelete, onReload } = props
+  const { extension, onDelete, onReload, onSetDisabled } = props
   return (
     <div>
       <div className="flex items-baseline">
-        <div className="text-#bbeeff flex-auto truncate">
+        <div className="flex-none mr-2">
+          <input
+            type="checkbox"
+            checked={!extension.disabled}
+            onChange={(e) => onSetDisabled(!e.target.checked)}
+          />
+        </div>
+        <div
+          className={
+            'flex-auto truncate ' +
+            (extension.disabled ? 'opacity-70 line-through' : 'text-#bbeeff')
+          }
+        >
           {extension.manifest?.name || extension.url}
         </div>
         <div className="flex-none">

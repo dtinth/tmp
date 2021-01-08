@@ -146,6 +146,14 @@ export async function updateExistingExtension(
   }
 }
 
+export async function setExtensionDisabledFlag(id: string, disabled: boolean) {
+  const extensionsDb = getExtensionsDatabase()
+  const doc = await extensionsDb.get(id)
+  doc.disabled = disabled
+  await extensionsDb.put(doc)
+  queryClient.invalidateQueries('extensions')
+}
+
 function getManifestUrl(url: string): string {
   return url.replace(/\?.*/, '').replace(/\/?$/, '/tmp-manifest.json')
 }
