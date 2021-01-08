@@ -21,7 +21,7 @@ You can put files into it, and you can get files out of it.
 - View in browser
 - [Download](builtin-download.html)
 - [Drag out files](builtin-drag.html)
-- Save to disk
+- [Save to disk](builtin-save.html)
 - Share to other apps
 
 </r-cell>
