@@ -20,6 +20,7 @@ export interface ExtensionEntry {
   manifest?: ExtensionManifest
   core: boolean
   updatedAt: string
+  disabled: boolean
   latestFetch: {
     error?: string
     fetchedAt: string

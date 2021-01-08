@@ -91,6 +91,7 @@ export async function addExtension(url: string, shouldInvalidate = true) {
     url,
     manifest,
     core: coreExtensionUrls.includes(url),
+    disabled: false,
     updatedAt: new Date().toJSON(),
     latestFetch: {
       fetchedAt: new Date().toJSON(),
