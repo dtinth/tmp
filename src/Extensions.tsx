@@ -1,13 +1,52 @@
 import axios from 'axios'
 import { useQuery } from 'react-query'
-import { builtinExtension } from './BuiltinExtension'
 import { getExtensionsDatabase } from './db'
 import { queryClient } from './GlobalReactQueryClient'
 
+let firstTimeQuery = true
+
+const coreExtensionUrls = [
+  '/core-extensions/json-viewer/',
+  '/core-extensions/vdo-player/',
+  'https://dtinth.github.io/tmp-photopea/',
+  'https://tmp-webrtc.spacet.me/',
+]
+
+const refreshAllExtensions = async () => {
+  const extensionsDb = getExtensionsDatabase()
+  const results = await extensionsDb.allDocs({ include_docs: true })
+  const alreadyAddedUrls = new Set(results.rows.map((r) => r.doc.url))
+  const actions: (() => Promise<void>)[] = []
+
+  const coreExtensionsUrlsToAdd = coreExtensionUrls.filter(
+    (url) => !alreadyAddedUrls.has(url)
+  )
+  for (const url of coreExtensionsUrlsToAdd) {
+    actions.push(() => addExtension(url, false))
+  }
+  for (const row of results.rows) {
+    actions.push(() => updateExistingExtension(row.id))
+  }
+
+  try {
+    await Promise.all(actions.map((a) => a()))
+  } catch (error) {
+    console.error('Refresh failed', error)
+  } finally {
+    queryClient.invalidateQueries('extensions')
+  }
+}
+
 const queryExtensions = async () => {
   const extensionsDb = getExtensionsDatabase()
-  const docs = await extensionsDb.allDocs({ include_docs: true })
-  return docs.rows.flatMap((row) => (row.doc ? [row.doc] : []))
+  const results = await extensionsDb.allDocs({ include_docs: true })
+  if (firstTimeQuery) {
+    firstTimeQuery = false
+    setTimeout(() => {
+      refreshAllExtensions()
+    })
+  }
+  return results.rows.flatMap((row) => (row.doc ? [row.doc] : []))
 }
 
 export function useExtensions() {
@@ -16,14 +55,13 @@ export function useExtensions() {
 
 export function useActiveExtensions() {
   return [
-    builtinExtension,
     ...(useQuery('extensions', queryExtensions).data || []).flatMap((e) =>
       e.manifest ? [e.manifest] : []
     ),
   ]
 }
 
-export async function addExtension(url: string) {
+async function fetchExtensionManifest(url: string) {
   const { data: manifest } = await axios.get(getManifestUrl(url), {
     responseType: 'json',
   })
@@ -41,24 +79,65 @@ export async function addExtension(url: string) {
       'Invalid manifest: "contributes" property is not an object.'
     )
   }
+  return manifest
+}
+
+export async function addExtension(url: string, shouldInvalidate = true) {
+  const manifest = await fetchExtensionManifest(url)
   const extensionsDb = getExtensionsDatabase()
   const _id = `extension/${url}`
   await extensionsDb.put({
     _id,
     url,
     manifest,
+    core: coreExtensionUrls.includes(url),
     latestFetch: {
       fetchedAt: new Date().toJSON(),
     },
   })
-  queryClient.invalidateQueries('extensions')
-  console.log(manifest)
+  if (shouldInvalidate) {
+    queryClient.invalidateQueries('extensions')
+  }
 }
 
-export async function deleteExtension(id: string) {
+export async function deleteExtension(id: string, shouldInvalidate = true) {
   const extensionsDb = getExtensionsDatabase()
   await extensionsDb.remove(await extensionsDb.get(id))
-  queryClient.invalidateQueries('extensions')
+  if (shouldInvalidate) {
+    queryClient.invalidateQueries('extensions')
+  }
+}
+
+export async function updateExistingExtension(
+  id: string,
+  shouldInvalidate = true
+) {
+  const extensionsDb = getExtensionsDatabase()
+  const doc = await extensionsDb.get(id)
+
+  // Remove removed core extensions
+  if (doc.core && !coreExtensionUrls.includes(doc.url)) {
+    return deleteExtension(id, shouldInvalidate)
+  }
+
+  // Update manifest
+  try {
+    const manifest = await fetchExtensionManifest(doc.url)
+    doc.manifest = manifest
+    doc.latestFetch = {
+      fetchedAt: new Date().toJSON(),
+    }
+  } catch (error) {
+    console.error('Unable to reload extension', id)
+    doc.latestFetch = {
+      fetchedAt: new Date().toJSON(),
+      error: String(error),
+    }
+  }
+
+  if (shouldInvalidate) {
+    queryClient.invalidateQueries('extensions')
+  }
 }
 
 function getManifestUrl(url: string): string {

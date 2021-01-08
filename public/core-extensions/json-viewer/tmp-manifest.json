@@ -1,0 +1,13 @@
+{
+  "name": "JSON Viewer",
+  "description": "View JSON files in json.spacet.me",
+  "contributes": {
+    "integrations": {
+      "view": {
+        "title": "JSON viewer",
+        "accept": ["application/json", ".json", ".ndjson", ".bmson"],
+        "url": "https://json.spacet.me/"
+      }
+    }
+  }
+}

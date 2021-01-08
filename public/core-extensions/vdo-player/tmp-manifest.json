@@ -1,0 +1,13 @@
+{
+  "name": "Video player",
+  "description": "View video files in vdo.spacet.me",
+  "contributes": {
+    "integrations": {
+      "view": {
+        "title": "Video player",
+        "accept": ["video/*"],
+        "url": "https://vdo.spacet.me/"
+      }
+    }
+  }
+}
