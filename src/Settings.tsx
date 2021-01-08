@@ -1,7 +1,12 @@
 import { Suspense, useEffect, useRef, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ExtensionEntry } from './db'
-import { addExtension, deleteExtension, useExtensions } from './Extensions'
+import {
+  addExtension,
+  deleteExtension,
+  updateExistingExtension,
+  useExtensions,
+} from './Extensions'
 
 function ClientOnly({ children }) {
   const [isComponentMounted, setIsComponentMounted] = useState(false)
@@ -61,12 +66,19 @@ function ExtensionsSettings() {
               <li key={extension._id} className="mb-2">
                 <ExtensionView
                   extension={extension}
-                  onDelete={() => {
-                    if (confirm('Do you want to delete this extension?')) {
-                      deleteExtension(extension._id)
-                    }
-                  }}
+                  onDelete={
+                    extension.core
+                      ? undefined
+                      : () => {
+                          if (
+                            confirm('Do you want to delete this extension?')
+                          ) {
+                            deleteExtension(extension._id)
+                          }
+                        }
+                  }
                   onReload={() => {
+                    updateExistingExtension(extension._id)
                     alert('Unimplemented')
                   }}
                 />
@@ -94,7 +106,7 @@ function ExtensionsSettings() {
 
 function ExtensionView(props: {
   extension: PouchDB.Core.ExistingDocument<ExtensionEntry>
-  onDelete: () => void
+  onDelete?: () => void
   onReload: () => void
 }) {
   const { extension, onDelete, onReload } = props
@@ -105,9 +117,11 @@ function ExtensionView(props: {
           {extension.manifest?.name || extension.url}
         </div>
         <div className="flex-none">
-          <button className="ml-2 text-sm text-#8b8685" onClick={onDelete}>
-            ❌
-          </button>
+          {!!onDelete && (
+            <button className="ml-2 text-sm text-#8b8685" onClick={onDelete}>
+              ❌
+            </button>
+          )}
           <button className="ml-2 text-sm text-#8b8685" onClick={onReload}>
             🔄
           </button>
