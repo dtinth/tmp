@@ -1,3 +1,7 @@
+---
+home: true
+---
+
 # tmp.spacet.me documentation
 
 [`tmp.spacet.me`](https://tmp.spacet.me) is a **web-based local file storage.**

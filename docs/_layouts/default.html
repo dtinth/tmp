@@ -16,6 +16,9 @@
   </head>
   <body>
     <div class="container-lg px-3 my-5 markdown-body comic-mono">
+      {% unless page.home %}
+      <a href="./" style="color: #8b8685">&larr; tmp.spacet.me documentation</a>
+      {% endunless %}
       {{ content }}
 
       {% if site.github.private != true and site.github.license %}
