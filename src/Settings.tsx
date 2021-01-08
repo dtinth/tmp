@@ -37,7 +37,9 @@ export default function Settings() {
 }
 
 function ExtensionsSettings() {
-  const extensions = useExtensions()
+  const extensions = [...useExtensions()].sort((a, b) =>
+    a.url < b.url ? -1 : 1
+  )
   const newUrlInput = useRef<HTMLInputElement>()
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
