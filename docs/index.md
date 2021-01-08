@@ -26,7 +26,7 @@ You can put files into it, and you can get files out of it.
 - [Download](builtin-download.html)
 - [Drag out files](builtin-drag.html)
 - [Save to disk](builtin-save.html)
-- Share to other apps
+- [Share to other apps](builtin-share.html) (Android)
 
 </r-cell>
 </r-grid>
