@@ -22,7 +22,7 @@ You can put files into it, and you can get files out of it.
 
 ## Getting files out
 
-- View in browser
+- [View in browser](builtin-browser.html)
 - [Download](builtin-download.html)
 - [Drag out files](builtin-drag.html)
 - [Save to disk](builtin-save.html)
