@@ -19,6 +19,7 @@ export interface ExtensionEntry {
   url: string
   manifest?: ExtensionManifest
   core: boolean
+  updatedAt: string
   latestFetch: {
     error?: string
     fetchedAt: string

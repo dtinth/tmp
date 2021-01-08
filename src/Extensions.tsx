@@ -91,6 +91,7 @@ export async function addExtension(url: string, shouldInvalidate = true) {
     url,
     manifest,
     core: coreExtensionUrls.includes(url),
+    updatedAt: new Date().toJSON(),
     latestFetch: {
       fetchedAt: new Date().toJSON(),
     },
@@ -123,7 +124,10 @@ export async function updateExistingExtension(
   // Update manifest
   try {
     const manifest = await fetchExtensionManifest(doc.url)
-    doc.manifest = manifest
+    if (JSON.stringify(doc.manifest) !== JSON.stringify(manifest)) {
+      doc.manifest = manifest
+      doc.updatedAt = new Date().toJSON()
+    }
     doc.latestFetch = {
       fetchedAt: new Date().toJSON(),
     }
@@ -134,6 +138,7 @@ export async function updateExistingExtension(
       error: String(error),
     }
   }
+  await extensionsDb.put(doc)
 
   if (shouldInvalidate) {
     queryClient.invalidateQueries('extensions')

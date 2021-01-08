@@ -115,6 +115,16 @@ function ExtensionView(props: {
         {extension.manifest?.description || '(no description given)'}
       </div>
       <div className="truncate text-#8b8685 text-sm">{extension.url}</div>
+      <div className="truncate text-#8b8685 text-xs">
+        Updated{' '}
+        <relative-time
+          dateTime={extension.updatedAt}
+          title={extension.updatedAt}
+          key={extension.updatedAt}
+        >
+          {extension.updatedAt}
+        </relative-time>
+      </div>
     </div>
   )
 }
