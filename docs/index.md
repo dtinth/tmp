@@ -8,8 +8,8 @@ You can put files into it, and you can get files out of it.
 
 ## Putting files in
 
-- Select files on device
-- Drop in files from your computer
+- Select files from your device
+- Drop in files
 - Paste in images
 - Share from other apps (Android)
 
@@ -20,6 +20,7 @@ You can put files into it, and you can get files out of it.
 
 - View in browser
 - Download
+- Drag out files
 - Save to disk
 - Share to other apps
 
