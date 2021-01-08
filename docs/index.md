@@ -6,6 +6,7 @@ home: true
 
 [`tmp.spacet.me`](https://tmp.spacet.me) is a **web-based local file storage.**
 You can put files into it, and you can get files out of it.
+More functionalities can be added through <span style="color: #bef">extensions</span>.
 
 <r-grid columns=12 columns-s=6>
 <r-cell span=6>
@@ -16,6 +17,7 @@ You can put files into it, and you can get files out of it.
 - [Drop in files](builtin-drop.html)
 - [Paste in images](builtin-paste.html)
 - [Share from other apps](builtin-share-target.html) (Android)
+- <span class="ext">[Receive via WebRTC](tmp-webrtc.html)</span>
 
 </r-cell>
 <r-cell span=6>
@@ -26,6 +28,7 @@ You can put files into it, and you can get files out of it.
 - [Drag out files](builtin-drag.html)
 - [Save to disk](builtin-save.html)
 - [Share to other apps](builtin-share.html) (Android)
+- <span class="ext">[Send via WebRTC](tmp-webrtc.html)</span>
 
 </r-cell>
 <r-cell span=6>
@@ -40,6 +43,13 @@ You can put files into it, and you can get files out of it.
 ## Manipulating files
 
 - <span class="ext">[Edit in Photopea](tmp-photopea.html)</span>
+
+</r-cell>
+<r-cell span=6>
+
+## Extending
+
+- [Extensions API](extensions-api.html)
 
 </r-cell>
 </r-grid>

@@ -4,34 +4,10 @@ import { addFile } from './addFile'
 import { getFilesDatabase } from './db'
 import { FileItem } from './Files'
 import { queryClient } from './GlobalReactQueryClient'
-import { JsonRpcDefinition, JsonRpcPayloadChecker } from './JsonRpc'
+import { JsonRpcPayloadChecker } from './JsonRpc'
+import { IntegrationsRpcInterface } from './IntegrationsRpcInterface'
 
-interface RpcInterface extends JsonRpcDefinition {
-  'tmp/getOpenedFile': {
-    params: {
-      sessionId: string
-    }
-    result: {
-      blob: Blob
-      file: {
-        _rev: string
-        _id: string
-        name: string
-        type: string
-      }
-    }
-  }
-  'tmp/newFile': {
-    params: {
-      sessionId: string
-      name: string
-      blob: Blob
-    }
-    result: {}
-  }
-}
-
-const rpc = new JsonRpcPayloadChecker<RpcInterface>()
+const rpc = new JsonRpcPayloadChecker<IntegrationsRpcInterface>()
 
 export function openWith(file: FileItem, url: string) {
   const sessionId = uuidv4()
