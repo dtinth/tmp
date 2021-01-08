@@ -48,7 +48,10 @@ export default function Home() {
         <link rel="icon" href="/tmp_512.png" />
       </Head>
       <strong>Welcome to your web-based local file storage.</strong> Just drop
-      or paste in files and images, and they will appear here.
+      or paste in files and images, and they will appear here.{' '}
+      <a href="https://tmp-docs.spacet.me" className="text-#ffffbb">
+        Learn more.
+      </a>
       <Files />
       <Settings />
       <ShareTargetWorker />
