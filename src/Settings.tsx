@@ -14,8 +14,10 @@ function ClientOnly({ children }) {
 
 export default function Settings() {
   return (
-    <div className="mt-6 max-w-xl">
-      <h2 className="text-#d7fc70 font-bold">Settings</h2>
+    <div className="mt-8 max-w-xl">
+      <h2 className="text-#d7fc70 font-bold border-b border-#656463 mb-2">
+        Settings
+      </h2>
 
       <ClientOnly>
         <ErrorBoundary fallback={<div>Error!</div>}>
@@ -47,12 +49,12 @@ function ExtensionsSettings() {
   }
   return (
     <div className="flex items-baseline mb-4 flex-wrap">
-      <div className="w-full md:w-1/3">
+      <div className="w-full md:w-1/4">
         <span className="block font-bold md:text-right mb-1 md:mb-0 pr-4">
-          Extension URLs
+          Extensions
         </span>
       </div>
-      <div className="w-full md:w-2/3">
+      <div className="w-full md:w-3/4">
         {extensions.length > 0 && (
           <ul>
             {extensions.map((extension) => (
