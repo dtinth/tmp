@@ -8,10 +8,10 @@ You can put files into it, and you can get files out of it.
 
 ## Putting files in
 
-- Select files from your device
-- Drop in files
-- Paste in images
-- Share from other apps (Android)
+- [Select files from your device](builtin.html#select-files-from-your-device)
+- [Drop in files](builtin.html#drop-in-files)
+- [Paste in images](builtin.html#paste-in-images)
+- [Share from other apps](builtin.html#share-from-other-apps) (Android)
 
 </r-cell>
 <r-cell span=4>
