@@ -406,9 +406,11 @@ function NewItemView(props: {}) {
           const { fileOpen } = await import('browser-nativefs')
           const files = await fileOpen({
             multiple: true,
-            mimeTypes: navigator.userAgent.includes('Safari/')
-              ? [' ']
-              : undefined,
+            mimeTypes:
+              navigator.userAgent.includes('Safari/') &&
+              !navigator.userAgent.includes('Chrome/')
+                ? [' ']
+                : undefined,
           })
           await importFiles(files)
         })}
