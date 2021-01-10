@@ -110,6 +110,18 @@ const fileActions: FileAction[] = [
     },
   },
   {
+    group: FileActionGroup.Share,
+    label: 'Copy to clipboard',
+    when: () => typeof (navigator?.clipboard as any)?.write === 'function',
+    action: async ({ file, blob }) => {
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          [blob.type]: blob,
+        }),
+      ])
+    },
+  },
+  {
     group: FileActionGroup.SaveAs,
     label: 'Save as',
     when: () => 'showSaveFilePicker' in window,
@@ -288,7 +300,8 @@ function FileView(props: { file: FileItem }) {
           action.label,
           action.action &&
             blobUrl &&
-            (() =>
+            (() => (
+              menu.hide(),
               action.action({
                 file,
                 blob: blobInfo.blob,
@@ -300,7 +313,8 @@ function FileView(props: { file: FileItem }) {
                     queryClientRef.current.invalidateQueries()
                   }
                 },
-              }))
+              })
+            ))
         )
       )
   }
