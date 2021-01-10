@@ -409,8 +409,14 @@ function NewItemView(props: {}) {
             mimeTypes:
               navigator.userAgent.includes('Safari/') &&
               !navigator.userAgent.includes('Chrome/')
-                ? [' ']
-                : undefined,
+                ? // Sending `undefined` causes Safari to open an file picker,
+                  // with no options to choose images. To fix this I must send
+                  // and array with a string with a single space. Not sure why
+                  // but it works :/
+                  [' ']
+                : // Chrome, on the other hand, errors out on the above,
+                  // complaining "Invalid type:"
+                  undefined,
           })
           await importFiles(files)
         })}
