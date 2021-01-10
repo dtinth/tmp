@@ -30,3 +30,4 @@ This project is participating in [the DigitalOcean App Platform Hackathon on DEV
 - [Part 2](https://dev.to/dtinth/tmp-spacet-me-devlog-part-2-34hi)
 - [Part 3](https://dev.to/dtinth/tmp-spacet-me-devlog-part-3-3eb2)
 - [Part 4](https://dev.to/dtinth/tmp-spacet-me-devlog-part-4-30k8)
+- [**Submission**](https://dev.to/dtinth/a-local-file-storage-for-the-web-and-interopearability-layer-for-web-based-apps-submission-1hcf)
