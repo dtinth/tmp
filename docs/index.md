@@ -36,6 +36,8 @@ More functionalities can be added through <span style="color: #bef">extensions</
 ## Viewing files
 
 - [View in browser](builtin-browser.html)
+- <span class="ext">[Explore JSON data](json-viewer.html)</span>
+- <span class="ext">[Play video](vdo-player.html)</span>
 
 </r-cell>
 <r-cell span=6>
